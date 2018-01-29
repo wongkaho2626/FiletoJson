@@ -19,18 +19,17 @@ public class FiletoJson {
 		FileReader frPost = null;
 		BufferedReader brComment = null;
 		FileReader frComment = null;
-		JSONArray posts = new JSONArray();
-		JSONArray comments = new JSONArray();
 
 		//read post file to post json
 		try {
+			JSONArray posts = new JSONArray();
 			brPost = new BufferedReader(new FileReader(POST));
 			frPost = new FileReader(POST);
 			brPost = new BufferedReader(frPost);
 			String sCurrentLine, id, title;
 			int firstIndexOf;
-			int cnt = 0;
-			while ((sCurrentLine = brPost.readLine()) != null && cnt < 3000000) {
+			int cntPost = 0;
+			while ((sCurrentLine = brPost.readLine()) != null) {
 				firstIndexOf = sCurrentLine.indexOf(" ");
 				id = sCurrentLine.substring(0, firstIndexOf).trim();
 				title = sCurrentLine.substring(firstIndexOf).trim();
@@ -38,8 +37,8 @@ public class FiletoJson {
     				post.put("id", id);
     				post.put("title", title);
     				posts.put(post);
-    				cnt++;
-    				System.out.println(cnt);
+    				cntPost++;
+    				System.out.println(cntPost);
 			}
 			
 			writePostToJson(posts);
@@ -56,50 +55,57 @@ public class FiletoJson {
 			}
 		}
 		
-		//read comment file to post json
-		try {
-			brComment = new BufferedReader(new FileReader(COMMENT));
-			frComment = new FileReader(COMMENT);
-			brComment = new BufferedReader(frComment);
-			String sCurrentLine, id, content, perviousID = null;
-			int firstIndexOf,secondIndexOf;
-			JSONObject comment = new JSONObject();
-			JSONArray contents = new JSONArray();
-			while ((sCurrentLine = brComment.readLine()) != null) {
-				firstIndexOf = sCurrentLine.indexOf("-");
-				secondIndexOf = sCurrentLine.indexOf(" ");
-				id = sCurrentLine.substring(0, firstIndexOf).trim();
-				content = sCurrentLine.substring(secondIndexOf).trim();
-				if(perviousID == null) {
-					perviousID = id;
-				}
-				if(id.equals(perviousID)) {
-					contents.put(content);
-				}else {
-					comment.put("id", perviousID);
-					comment.put("content", contents);
-					comments.put(comment);
-					comment = new JSONObject();
-					contents = new JSONArray();
-					perviousID = id;
-					contents.put(content);
-				}
-			}
-			comment.put("id", perviousID);
-			comment.put("content", contents);
-			comments.put(comment);
-			
-			writeCommentToJson(comments);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
+		
+		//read comment file to comment json
+		for(int i = 1500; i < 2721; i++) {
 			try {
-				if (brPost != null)
-					brPost.close();
-				if (frPost != null)
-					frPost.close();
-			} catch (IOException ex) {
-				ex.printStackTrace();
+				JSONArray comments = new JSONArray();
+				brComment = new BufferedReader(new FileReader("/Users/wongkaho/Eclipse Workspace/FiletoJson/data/" + COMMENT + i));
+				frComment = new FileReader("/Users/wongkaho/Eclipse Workspace/FiletoJson/data/" + COMMENT + i);
+				brComment = new BufferedReader(frComment);
+				String sCurrentLine, id, content, perviousID = null;
+				int firstIndexOf,secondIndexOf;
+				JSONObject comment = new JSONObject();
+				JSONArray contents = new JSONArray();
+				int cntComment = 0;
+				while ((sCurrentLine = brComment.readLine()) != null) {
+					firstIndexOf = sCurrentLine.indexOf("-");
+					secondIndexOf = sCurrentLine.indexOf(" ");
+					id = sCurrentLine.substring(0, firstIndexOf).trim();
+					content = sCurrentLine.substring(secondIndexOf).trim();
+					if(perviousID == null) {
+						perviousID = id;
+					}
+					if(id.equals(perviousID)) {
+						contents.put(content);
+					}else {
+						comment.put("id", perviousID);
+						comment.put("content", contents);
+						comments.put(comment);
+						comment = new JSONObject();
+						contents = new JSONArray();
+						perviousID = id;
+						contents.put(content);
+					}
+					cntComment++;
+					System.out.println(cntComment);
+				}
+				comment.put("id", perviousID);
+				comment.put("content", contents);
+				comments.put(comment);
+				
+				writeCommentToJson(comments, i);
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				try {
+					if (brComment != null)
+						brComment.close();
+					if (frComment != null)
+						frComment.close();
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
 			}
 		}
 	}
@@ -117,8 +123,8 @@ public class FiletoJson {
 		writerPost.close();
 	}
 	
-	public static void writeCommentToJson (JSONArray common) throws IOException {
-		File fileCommon = new File("comment.json");
+	public static void writeCommentToJson (JSONArray common, int i) throws IOException {
+		File fileCommon = new File(COMMENT + i + ".json");
 		
 		if (!fileCommon.exists()) {
 			fileCommon.createNewFile();
@@ -129,5 +135,5 @@ public class FiletoJson {
 
 		writerCommon.write(common.toString());
 		writerCommon.close();
-}
+	}
 }
