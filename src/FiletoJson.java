@@ -63,7 +63,7 @@ public class FiletoJson {
 				brComment = new BufferedReader(new FileReader("/Users/wongkaho/Eclipse Workspace/FiletoJson/data/" + COMMENT + i));
 				frComment = new FileReader("/Users/wongkaho/Eclipse Workspace/FiletoJson/data/" + COMMENT + i);
 				brComment = new BufferedReader(frComment);
-				String sCurrentLine, id, content, perviousID = null;
+				String sCurrentLine, id, I, content, perviousID = null;
 				int firstIndexOf,secondIndexOf;
 				JSONObject comment = new JSONObject();
 				JSONArray contents = new JSONArray();
@@ -72,26 +72,33 @@ public class FiletoJson {
 					firstIndexOf = sCurrentLine.indexOf("-");
 					secondIndexOf = sCurrentLine.indexOf(" ");
 					id = sCurrentLine.substring(0, firstIndexOf).trim();
+					I = sCurrentLine.substring(firstIndexOf+1, secondIndexOf).trim();
 					content = sCurrentLine.substring(secondIndexOf).trim();
 					if(perviousID == null) {
 						perviousID = id;
 					}
 					if(id.equals(perviousID)) {
-						contents.put(content);
+						JSONObject contentDetail = new JSONObject();
+						contentDetail.put("i", I);
+						contentDetail.put("content", content);
+						contents.put(contentDetail);
 					}else {
 						comment.put("id", perviousID);
-						comment.put("content", contents);
+						comment.put("contents", contents);
 						comments.put(comment);
 						comment = new JSONObject();
 						contents = new JSONArray();
 						perviousID = id;
-						contents.put(content);
+						JSONObject contentDetail = new JSONObject();
+						contentDetail.put("i", I);
+						contentDetail.put("content", content);
+						contents.put(contentDetail);
 					}
 					cntComment++;
 					System.out.println(cntComment);
 				}
 				comment.put("id", perviousID);
-				comment.put("content", contents);
+				comment.put("contents", contents);
 				comments.put(comment);
 				
 				writeCommentToJson(comments, i);
