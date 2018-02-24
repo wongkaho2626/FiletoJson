@@ -23,8 +23,8 @@ public class FiletoJson {
 		//read post file to post json
 		try {
 			JSONArray posts = new JSONArray();
-			brPost = new BufferedReader(new FileReader(POST));
-			frPost = new FileReader(POST);
+			brPost = new BufferedReader(new FileReader("/Users/wongkaho/Eclipse Workspace/FiletoJson/data/" + POST));
+			frPost = new FileReader("/Users/wongkaho/Eclipse Workspace/FiletoJson/data/" + POST);
 			brPost = new BufferedReader(frPost);
 			String sCurrentLine, id, title;
 			int firstIndexOf;
@@ -57,7 +57,7 @@ public class FiletoJson {
 		
 		
 		//read comment file to comment json
-		for(int i = 1500; i < 2721; i++) {
+		for(int i = 1500; i < 2727; i++) {
 			try {
 				JSONArray comments = new JSONArray();
 				brComment = new BufferedReader(new FileReader("/Users/wongkaho/Eclipse Workspace/FiletoJson/data/" + COMMENT + i));
