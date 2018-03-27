@@ -73,15 +73,17 @@ public class FiletoJson {
 					secondIndexOf = sCurrentLine.indexOf(" ");
 					id = sCurrentLine.substring(0, firstIndexOf).trim();
 					I = sCurrentLine.substring(firstIndexOf+1, secondIndexOf).trim();
-					content = sCurrentLine.substring(secondIndexOf).trim();
+					content = filterWord(sCurrentLine.substring(secondIndexOf).trim());
 					if(perviousID == null) {
 						perviousID = id;
 					}
 					if(id.equals(perviousID)) {
-						JSONObject contentDetail = new JSONObject();
-						contentDetail.put("i", I);
-						contentDetail.put("content", content);
-						contents.put(contentDetail);
+						if(content.length() > 0 && !content.contains("引用: 原帖由")) {
+							JSONObject contentDetail = new JSONObject();
+							contentDetail.put("i", I);
+							contentDetail.put("content", content);
+							contents.put(contentDetail);
+						}
 					}else {
 						comment.put("id", perviousID);
 						comment.put("contents", contents);
@@ -89,10 +91,12 @@ public class FiletoJson {
 						comment = new JSONObject();
 						contents = new JSONArray();
 						perviousID = id;
-						JSONObject contentDetail = new JSONObject();
-						contentDetail.put("i", I);
-						contentDetail.put("content", content);
-						contents.put(contentDetail);
+						if(content.length() > 0 && !content.contains("引用: 原帖由")) {
+							JSONObject contentDetail = new JSONObject();
+							contentDetail.put("i", I);
+							contentDetail.put("content", content);
+							contents.put(contentDetail);
+						}
 					}
 					cntComment++;
 					System.out.println(cntComment);
@@ -142,5 +146,14 @@ public class FiletoJson {
 
 		writerCommon.write(common.toString());
 		writerCommon.close();
+	}
+	
+	private static String filterWord(String input) {
+		String output = input;
+		if(input.contains("[ 本帖最後由")) {
+			int firstindexof = input.indexOf("[ 本帖最後由");
+			output = input.substring(0, firstindexof);
+		}
+		return output;
 	}
 }
